@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="AmazonY.API/AmazonY.API.csproj" />
+    <Project Path="AmazonY.Core/AmazonY.Core.csproj" />
+    <Project Path="AmazonY.Infrastructure/AmazonY.Infrastructure.csproj" />
+  </Folder>
+</Solution>
