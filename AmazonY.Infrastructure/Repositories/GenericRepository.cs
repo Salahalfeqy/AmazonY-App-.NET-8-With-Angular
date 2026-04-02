@@ -35,33 +35,53 @@ namespace AmazonY.Infrastructure.Repositories
         public async Task<IReadOnlyList<T>> GetAllAsync()
         => await _context.Set<T>().AsNoTracking().ToListAsync();
 
+        //public async Task<IReadOnlyList<T>> GetAllAsync(params Expression<Func<T, object>>[] includes)
+        //{
+        //    var query =  _context.Set<T>()
+        //        .AsQueryable();
+        //    foreach (var item in includes)
+        //    {
+        //        query.Include(item);
+        //    }
+        //    return await query.ToListAsync();
+        //}
         public async Task<IReadOnlyList<T>> GetAllAsync(params Expression<Func<T, object>>[] includes)
         {
-            var query =  _context.Set<T>()
+            var query = _context.Set<T>()
                 .AsQueryable();
             foreach (var item in includes)
             {
-                query.Include(item);
+                query = query.Include(item);
             }
-            return await query.ToListAsync();
+            return await query.AsNoTracking().ToListAsync();
         }
-         
+
         public async Task<T> GetByIdAsync(int id)
         {
             var entity = await _context.Set<T>().FindAsync(id);
             return entity;
         }
 
-        public async Task<T> GetByIdAssync(int id, params Expression<Func<T, object>>[] includes)
-        {
-            IQueryable<T> query = _context.Set<T>()
-                .AsQueryable();
-            foreach (var item in includes)
-            {
-                query.Include(item);
-            }
-            var  entity= await query.FirstOrDefaultAsync(x=>EF.Property<int>(x,"Id")==id);
+        //public async Task<T> GetByIdAsync(int id, params Expression<Func<T, object>>[] includes)
+        //{
+        //    IQueryable<T> query = _context.Set<T>()
+        //        .AsQueryable();
+        //    foreach (var item in includes)
+        //    {
+        //        query.Include(item);
+        //    }
+        //    var  entity= await query.FirstOrDefaultAsync(x=>EF.Property<int>(x,"Id")==id);
 
+        //    return entity;
+        //}
+        public async Task<T> GetByIdAsync(int id, params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _context.Set<T>().AsQueryable();
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            var entity = await query.FirstOrDefaultAsync(x => EF.Property<int>(x, "id") == id);
             return entity;
         }
 
@@ -71,9 +91,6 @@ namespace AmazonY.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public Task<T> GetByIdAsync(int id, params Expression<Func<T, object>>[] includes)
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }

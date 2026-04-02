@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <File Path="notes.txt" />
     <Project Path="AmazonY.API/AmazonY.API.csproj" />
     <Project Path="AmazonY.Core/AmazonY.Core.csproj" />
     <Project Path="AmazonY.Infrastructure/AmazonY.Infrastructure.csproj" />

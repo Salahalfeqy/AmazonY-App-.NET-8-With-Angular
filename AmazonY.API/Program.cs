@@ -1,5 +1,12 @@
+using AmazonY.API.Mapping;
 using AmazonY.Infrastructure;
+using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
+
+using System.IO;
 namespace AmazonY.API
+
+
 {
     public class Program
     {
@@ -14,6 +21,24 @@ namespace AmazonY.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.InfrastructureConfiguration(builder.Configuration);
+// chat gpt error solve
+    //    builder.Services.AddSingleton<IFileProvider>(
+    //new PhysicalFileProvider(
+    //    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")
+    //));
+ // chat gpt error solve
+
+            //builder.Services.AddAutoMapper( x => x.AddProfile(new CategoryProfile()));
+            //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            //builder.Services.AddAutoMapper(cfg =>
+            //{
+            //    cfg.AddProfile(new CategoryProfile());
+            //    cfg.AddProfile(new ProductMapping());
+            //}, AppDomain.CurrentDomain.GetAssemblies());
+            builder.Services.AddAutoMapper(cfg =>
+            {
+                cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies());
+            });
 
             var app = builder.Build();
 

@@ -18,11 +18,19 @@ namespace AmazonY.Infrastructure.Data.Config
                    
 
             builder.Property(p => p.Description).IsRequired();
-            builder.Property(p => p.Price)
+            builder.Property(p => p.NewPrice)
                    .IsRequired()
                    .HasColumnType("decimal(18,2)");
+            builder.Property(p => p.OldPrice)
+                   .IsRequired()
+                   .HasColumnType("decimal(18,2)");
+            //builder.Property(p => p.OldPrice)
+            //   .HasPrecision(18, 2);
+
+            //builder.Property(p => p.NewPrice)
+            //       .HasPrecision(18, 2);
             builder.HasData(
-                new Product { id = 1, Name = "test ", Description = "test", CategoryId = 1, Price = 123 }
+                new Product { id = 1, Name = "test ", Description = "test", CategoryId = 1, NewPrice = 123 }
                 );
         }
     }
