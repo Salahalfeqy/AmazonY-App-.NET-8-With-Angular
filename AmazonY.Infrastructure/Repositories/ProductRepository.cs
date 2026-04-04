@@ -1,16 +1,17 @@
 ﻿using AmazonY.Core.DTO;
 using AmazonY.Core.Entities.Product;
 using AmazonY.Core.Interfaces;
+using AmazonY.Core.Services;
+using AmazonY.Core.Sharing;
 using AmazonY.Infrastructure.Data;
+using AmazonY.Infrastructure.Service;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
-using AmazonY.Core.Services;
-using Microsoft.EntityFrameworkCore;
-using AmazonY.Infrastructure.Service;
 
 namespace AmazonY.Infrastructure.Repositories
 {
@@ -26,6 +27,61 @@ namespace AmazonY.Infrastructure.Repositories
             this.context = context;
             this.mapper = mapper;
             this.imageManagementService = imageManagementService;
+        }
+
+        public async Task<IEnumerable<ProductDTO>>GetAllAsync(ProductParams productParams)
+        {
+            var query = context.Products
+                .Include(m => m.Category)
+                .Include(m => m.Photos)
+                .AsNoTracking();
+            //filtering by word
+            if (!string.IsNullOrEmpty(productParams.Search))
+            {
+                //query = query.Where(
+                //    m => m.Name.ToLower().Contains(productParams.Search.ToLower())
+                //    ||
+                //m.Description.ToLower().Contains( productParams.Search.ToLower() )
+                //);
+
+                var searchWords = productParams.Search.Split(' ');
+                query = query.Where(m=> searchWords.All(
+                    word=> 
+                    m.Name.ToLower().Contains(word.ToLower())
+                    ||m.Description.ToLower().Contains(word.ToLower()) 
+                    ));
+
+
+            }
+
+
+
+
+            //filtering by category id logic
+            if (productParams.CategoryId.HasValue)
+                query = query.Where(m => m.CategoryId == productParams.CategoryId);
+
+            //sorting logic
+            if (!string.IsNullOrEmpty(productParams.sort))
+            {
+                query = productParams.sort switch
+                {
+                    "PriceAce" => query.OrderBy(m => m.NewPrice),
+                    "PriceDce" => query.OrderByDescending(m => m.NewPrice),
+                    _ => query.OrderBy(m => m.Name),
+                };
+            }
+            //pagination logic here
+            // pagination logic should alwaiys be the last logic in the function
+
+            //this logic is added to product params class so we commented it here
+            //productParams.pageNumber = productParams.pageNumber > 0 ? productParams.pageNumber : 1;
+            //productParams.pageSize = productParams.pageSize > 0 ? productParams.pageSize : 3;
+
+
+             query = query.Skip((productParams.pageSize) *(productParams.pageNumber - 1)).Take(productParams.pageSize);
+            var result = mapper.Map<List<ProductDTO>>(query);
+            return result;
         }
 
         public async Task<bool> AddAsync(AddProductDTO productDTO)

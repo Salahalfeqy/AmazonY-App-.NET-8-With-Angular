@@ -23,6 +23,7 @@ namespace AmazonY.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+
         public async Task DeleteAsync(int id)
         {
 
@@ -90,6 +91,8 @@ namespace AmazonY.Infrastructure.Repositories
            _context.Entry(entity).State= EntityState.Modified;
             await _context.SaveChangesAsync();
         }
+        public async Task<int> CountAsync()
+        =>await  _context.Set<T>().CountAsync();
 
         
     }

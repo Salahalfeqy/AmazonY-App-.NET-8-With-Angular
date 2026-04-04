@@ -1,6 +1,7 @@
 ﻿using AmazonY.API.Helper;
 using AmazonY.Core.DTO;
 using AmazonY.Core.Interfaces;
+using AmazonY.Core.Sharing;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,18 +16,20 @@ namespace AmazonY.API.Controllers
 
         }
         [HttpGet("get-all")]
-        public async Task<IActionResult> get()
+        public async Task<IActionResult> get([FromQuery]ProductParams productParams )
         {
             try
             {
-                var Product = await work.ProductRepository
-                    .GetAllAsync(x => x.Category, x => x.Photos);
-                var result = mapper.Map<List<ProductDTO>>(Product);
-                if (Product is null)
-                {
-                    return BadRequest(new ResponseAPI(400));
-                }
-                return Ok(result);
+                var Product = await work.ProductRepository.GetAllAsync(productParams);
+                /* .GetAllAsync(x => x.Category, x => x.Photos);*/
+                // commmented because no logic should be in the controller and replaced by another logic in productRepository 
+                //var result = mapper.Map<List<ProductDTO>>(Product);
+                //if (Product is null)
+                //{
+                //    return BadRequest(new ResponseAPI(400));
+                //} 
+                var totalCount =await work.ProductRepository.CountAsync();
+                 return Ok(new Pagination<ProductDTO>(productParams.pageNumber , productParams.pageSize, totalCount,Product ));
             }
             catch (Exception ex)
             {
